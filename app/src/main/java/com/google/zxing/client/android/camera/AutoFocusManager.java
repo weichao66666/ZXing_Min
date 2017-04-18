@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2012 ZXing authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.google.zxing.client.android.camera;
 
 import android.content.Context;
@@ -25,13 +9,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.RejectedExecutionException;
 
-
-@SuppressWarnings("deprecation") // camera APIs
+@SuppressWarnings("deprecation")
 final class AutoFocusManager implements Camera.AutoFocusCallback {
     private static final String TAG = AutoFocusManager.class.getSimpleName();
 
     private static final long AUTO_FOCUS_INTERVAL_MS = 2000L;
     private static final Collection<String> FOCUS_MODES_CALLING_AF;
+    private final Context context;
 
     static {
         FOCUS_MODES_CALLING_AF = new ArrayList<>(2);
@@ -46,6 +30,7 @@ final class AutoFocusManager implements Camera.AutoFocusCallback {
     private AsyncTask<?, ?, ?> outstandingTask;
 
     AutoFocusManager(Context context, Camera camera) {
+        this.context = context;
         this.camera = camera;
         String currentFocusMode = camera.getParameters().getFocusMode();
         useAutoFocus =
@@ -80,9 +65,7 @@ final class AutoFocusManager implements Camera.AutoFocusCallback {
                     camera.autoFocus(this);
                     focusing = true;
                 } catch (RuntimeException re) {
-                    // Have heard RuntimeException reported in Android 4.0.x+; continue?
                     Log.w(TAG, "Unexpected exception while focusing", re);
-                    // Try again later to keep cycle going
                     autoFocusAgainLater();
                 }
             }
@@ -102,11 +85,9 @@ final class AutoFocusManager implements Camera.AutoFocusCallback {
         stopped = true;
         if (useAutoFocus) {
             cancelOutstandingTask();
-            // Doesn't hurt to call this even if not focusing
             try {
                 camera.cancelAutoFocus();
             } catch (RuntimeException re) {
-                // Have heard RuntimeException reported in Android 4.0.x+; continue?
                 Log.w(TAG, "Unexpected exception while cancelling focusing", re);
             }
         }
@@ -118,7 +99,7 @@ final class AutoFocusManager implements Camera.AutoFocusCallback {
             try {
                 Thread.sleep(AUTO_FOCUS_INTERVAL_MS);
             } catch (InterruptedException e) {
-                // continue
+                e.printStackTrace();
             }
             start();
             return null;

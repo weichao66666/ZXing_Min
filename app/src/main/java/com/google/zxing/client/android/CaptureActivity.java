@@ -8,7 +8,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
@@ -67,9 +66,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.capture);
-
-        // 载入部分参数默认值
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
     }
 
     @Override
